@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabinet Médical - Système de Gestion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/tabler-icons.min.css">
+    <style>
+:root {
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f5f5f5;
+  --color-background-tertiary: #fafafa;
+  --color-border-primary: #e0e0e0;
+  --color-border-secondary: #d0d0d0;
+  --color-border-tertiary: #c0c0c0;
+  --color-text-primary: #222222;
+  --color-text-secondary: #666666;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.app { display: flex; height: 100vh; min-height: 600px; background: var(--color-background-tertiary); }
+.sidebar { width: 220px; background: var(--color-background-primary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; padding: 16px 0; flex-shrink: 0; }
+.logo { padding: 0 16px 20px; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 12px; }
+.logo-text { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.logo-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; font-size: 13px; color: var(--color-text-secondary); border-radius: 0; transition: background 0.1s; }
+.nav-item:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.nav-item.active { background: #E6F1FB; color: #185FA5; font-weight: 500; }
+.nav-item i { font-size: 17px; }
+.lang-switcher { margin-top: auto; padding: 12px 16px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; gap: 6px; }
+.lang-btn { flex: 1; padding: 5px 0; text-align: center; font-size: 11px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; background: transparent; color: var(--color-text-secondary); }
+.lang-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+.main { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.page { display: none; }
+.page.active { display: block; }
+.page-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 16px; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px 16px; }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.stat-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.stat-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px 20px; margin-bottom: 16px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); font-size: 13px; cursor: pointer; font-family: var(--font-sans); }
+.btn:hover { background: var(--color-background-secondary); }
+.btn-primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+.btn-primary:hover { background: #0C447C; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 12px; font-weight: 500; font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+td { padding: 10px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--color-background-secondary); }
+.badge { display: inline-block; padding: 3px 8px; border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; }
+.badge-success { background: #EAF3DE; color: #3B6D11; }
+.badge-warning { background: #FAEEDA; color: #854F0B; }
+.badge-danger { background: #FCEBEB; color: #A32D2D; }
+.badge-info { background: #E6F1FB; color: #185FA5; }
+.badge-gray { background: #F1EFE8; color: #5F5E5A; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
+.form-group input, .form-group select, .form-group textarea { font-family: var(--font-sans); font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; background: var(--color-background-primary); color: var(--color-text-primary); }
+.form-group textarea { resize: vertical; min-height: 70px; }
+.divider { height: 0.5px; background: var(--color-border-tertiary); margin: 16px 0; }
+.payment-summary { background: #E6F1FB; border-radius: var(--border-radius-md); padding: 14px 16px; }
+.payment-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 4px 0; }
+.payment-row.total { font-weight: 500; font-size: 15px; border-top: 0.5px solid #B5D4F4; margin-top: 8px; padding-top: 10px; color: #0C447C; }
+.client-avatar { width: 32px; height: 32px; border-radius: 50%; background: #E6F1FB; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #185FA5; }
+.today-list { display: flex; flex-direction: column; gap: 8px; }
+.appt-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); border-left: 3px solid #185FA5; }
+.appt-time { font-size: 12px; font-weight: 500; color: #185FA5; min-width: 50px; }
+.appt-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.appt-service { font-size: 11px; color: var(--color-text-secondary); }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); padding: 24px; width: 500px; max-width: 95vw; }
+.modal-title { font-size: 16px; font-weight: 500; margin-bottom: 16px; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.section-tabs { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 16px; }
+.stab { padding: 8px 16px; font-size: 13px; cursor: pointer; color: var(--color-text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.stab.active { color: #185FA5; border-bottom-color: #185FA5; font-weight: 500; }
+@media (max-width: 768px) {
+  .sidebar { width: 60px; }
+  .logo-text, .logo-sub, .nav-item span, .lang-btn { display: none; }
+  .nav-item { justify-content: center; padding: 12px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+
+<h2 class="sr-only">Cabinet médical — système de gestion</h2>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-text"><i class="ti ti-stethoscope" style="color:#185FA5;margin-right:6px"></i><span id="app-name">Cabinet Médical</span></div>
+      <div class="logo-sub" id="app-sub">Système de gestion</div>
+    </div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i><span data-key="nav_dashboard">Tableau de bord</span></div>
+    <div class="nav-item" onclick="showPage('clients',this)"><i class="ti ti-users"></i><span data-key="nav_clients">Clients</span></div>
+    <div class="nav-item" onclick="showPage('appointments',this)"><i class="ti ti-calendar"></i><span data-key="nav_appts">Rendez-vous</span></div>
+    <div class="nav-item" onclick="showPage('payments',this)"><i class="ti ti-cash"></i><span data-key="nav_payments">Paiements</span></div>
+    <div class="lang-switcher">
+      <button class="lang-btn" onclick="setLang('ar')">ع</button>
+      <button class="lang-btn active" onclick="setLang('fr')">Fr</button>
+      <button class="lang-btn" onclick="setLang('en')">En</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-title" data-key="nav_dashboard">Tableau de bord</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label" data-key="stat_today">Clients aujourd'hui</div>
+          <div class="stat-val" id="stat-today">8</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" data-key="stat_month">Revenus ce mois</div>
+          <div class="stat-val" id="stat-month">14,200 DH</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" data-key="stat_pending">Avances en attente</div>
+          <div class="stat-val" id="stat-pending">3,500 DH</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" data-key="stat_total_clients">Total clients</div>
+          <div class="stat-val">47</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" data-key="today_appts">Rendez-vous d'aujourd'hui</div>
+          <button class="btn btn-sm btn-primary" onclick="openNewAppt()"><i class="ti ti-plus"></i><span data-key="add_appt">Nouveau</span></button>
+        </div>
+        <div class="today-list" id="today-list"></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="page-clients" class="page">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="page-title" style="margin-bottom:0" data-key="nav_clients">Clients</div>
+        <button class="btn btn-primary" onclick="openNewClient()"><i class="ti ti-plus"></i><span data-key="add_client">Nouveau client</span></button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table id="clients-table">
+          <thead><tr>
+            <th data-key="th_name">Nom</th>
+            <th data-key="th_phone">Téléphone</th>
+            <th data-key="th_service">Service</th>
+            <th data-key="th_libague">Libagué</th>
+            <th data-key="th_avance">Avance</th>
+            <th data-key="th_reste">Reste</th>
+            <th data-key="th_status">Statut</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="clients-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div id="page-appointments" class="page">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="page-title" style="margin-bottom:0" data-key="nav_appts">Rendez-vous</div>
+        <button class="btn btn-primary" onclick="openNewAppt()"><i class="ti ti-plus"></i><span data-key="add_appt">Nouveau</span></button>
+      </div>
+      <div class="section-tabs">
+        <div class="stab active" onclick="filterAppts('all',this)" data-key="all_appts">Tous</div>
+        <div class="stab" onclick="filterAppts('upcoming',this)" data-key="upcoming">À venir</div>
+        <div class="stab" onclick="filterAppts('past',this)" data-key="passed">Passés</div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table>
+          <thead><tr>
+            <th data-key="th_date">Date</th>
+            <th data-key="th_name">Client</th>
+            <th data-key="th_service">Service</th>
+            <th data-key="th_libague">Libagué</th>
+            <th data-key="th_return">Retour dans</th>
+            <th data-key="th_status">Statut</th>
+          </tr></thead>
+          <tbody id="appts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="page-payments" class="page">
+      <div class="page-title" data-key="nav_payments">Paiements & Avances</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" data-key="add_payment">Enregistrer un paiement</div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label data-key="th_name">Client</label>
+            <select id="pay-client"><option value="">-- <span data-key="select_client">Choisir client</span> --</option></select>
+          </div>
+          <div class="form-group">
+            <label data-key="th_service">Service (libagué)</label>
+            <input type="text" id="pay-service" placeholder="Ex: Consultation, Soin...">
+          </div>
+          <div class="form-group">
+            <label data-key="total_price">Prix total (DH)</label>
+            <input type="number" id="pay-total" placeholder="3000">
+          </div>
+          <div class="form-group">
+            <label data-key="avance_label">Avance reçue (DH)</label>
+            <input type="number" id="pay-avance" placeholder="1000">
+          </div>
+          <div class="form-group">
+            <label data-key="return_days">Rendez-vous dans (jours)</label>
+            <input type="number" id="pay-days" placeholder="6">
+          </div>
+        </div>
+        <div id="pay-summary" style="display:none; margin-top:14px" class="payment-summary">
+          <div class="payment-row"><span data-key="total_price">Prix total</span><span id="ps-total"></span></div>
+          <div class="payment-row"><span data-key="avance_label">Avance payée</span><span id="ps-avance" style="color:#3B6D11"></span></div>
+          <div class="payment-row total"><span data-key="reste_label">Reste à payer</span><span id="ps-reste"></span></div>
+        </div>
+        <div style="margin-top:14px; display:flex; gap:8px">
+          <button class="btn" onclick="calcPay()" data-key="calc_btn">Calculer</button>
+          <button class="btn btn-primary" onclick="savePay()" data-key="save_btn">Enregistrer</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px" data-key="payment_history">Historique des paiements</div>
+        <table>
+          <thead><tr>
+            <th data-key="th_date">Date</th>
+            <th data-key="th_name">Client</th>
+            <th data-key="th_service">Service</th>
+            <th data-key="th_total">Total</th>
+            <th data-key="th_avance">Avance</th>
+            <th data-key="th_reste">Reste</th>
+            <th data-key="th_status">Statut</th>
+          </tr></thead>
+          <tbody id="payments-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW CLIENT MODAL -->
+<div class="modal-overlay" id="modal-client">
+  <div class="modal">
+    <div class="modal-title" data-key="add_client">Nouveau client</div>
+    <div class="form-grid">
+      <div class="form-group"><label data-key="th_name">Nom complet</label><input id="nc-name" type="text"></div>
+      <div class="form-group"><label data-key="th_phone">Téléphone</label><input id="nc-phone" type="text"></div>
+      <div class="form-group"><label data-key="th_service">Service souhaité</label><input id="nc-service" type="text" placeholder="Ex: Darssa, Consultation..."></div>
+      <div class="form-group"><label data-key="th_date">Date première visite</label><input id="nc-date" type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-client')" data-key="cancel">Annuler</button>
+      <button class="btn btn-primary" onclick="saveClient()" data-key="save_btn">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW APPT MODAL -->
+<div class="modal-overlay" id="modal-appt">
+  <div class="modal">
+    <div class="modal-title" data-key="add_appt">Nouveau rendez-vous</div>
+    <div class="form-grid">
+      <div class="form-group"><label data-key="th_name">Client</label><select id="na-client"></select></div>
+      <div class="form-group"><label data-key="th_date">Date</label><input id="na-date" type="date"></div>
+      <div class="form-group"><label data-key="th_time">Heure</label><input id="na-time" type="time"></div>
+      <div class="form-group"><label data-key="th_service">Service</label><input id="na-service" type="text"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-appt')" data-key="cancel">Annuler</button>
+      <button class="btn btn-primary" onclick="saveAppt()" data-key="save_btn">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LANGS = {
+  fr: {
+    nav_dashboard:'Tableau de bord', nav_clients:'Clients', nav_appts:'Rendez-vous', nav_payments:'Paiements',
+    stat_today:'Clients aujourd\'hui', stat_month:'Revenus ce mois', stat_pending:'Avances en attente', stat_total_clients:'Total clients',
+    today_appts:'Rendez-vous aujourd\'hui', add_appt:'Nouveau RDV', add_client:'Nouveau client', add_payment:'Enregistrer un paiement',
+    th_name:'Nom', th_phone:'Téléphone', th_service:'Service', th_libague:'Libagué', th_avance:'Avance', th_reste:'Reste',
+    th_status:'Statut', th_date:'Date', th_return:'Retour', th_total:'Total', th_time:'Heure',
+    total_price:'Prix total (DH)', avance_label:'Avance reçue (DH)', return_days:'RDV dans (jours)',
+    calc_btn:'Calculer', save_btn:'Enregistrer', cancel:'Annuler',
+    reste_label:'Reste à payer', payment_history:'Historique paiements',
+    all_appts:'Tous', upcoming:'À venir', passed:'Passés',
+    select_client:'Choisir client',
+    app_name:'Cabinet Médical', app_sub:'Système de gestion',
+    status_paid:'Payé', status_partial:'Avance', status_pending:'En attente',
+    days_ago:'il y a {n}j', in_days:'dans {n}j', today_label:'Aujourd\'hui'
+  },
+  ar: {
+    nav_dashboard:'لوحة التحكم', nav_clients:'المرضى', nav_appts:'المواعيد', nav_payments:'المدفوعات',
+    stat_today:'مرضى اليوم', stat_month:'إيرادات الشهر', stat_pending:'السلف المعلقة', stat_total_clients:'إجمالي المرضى',
+    today_appts:'مواعيد اليوم', add_appt:'موعد جديد', add_client:'مريض جديد', add_payment:'تسجيل دفعة',
+    th_name:'الاسم', th_phone:'الهاتف', th_service:'الخدمة', th_libague:'الليباغ', th_avance:'السلفة', th_reste:'الباقي',
+    th_status:'الحالة', th_date:'التاريخ', th_return:'العودة', th_total:'الإجمالي', th_time:'الوقت',
+    total_price:'السعر الكامل (DH)', avance_label:'السلفة المستلمة (DH)', return_days:'الموعد بعد (أيام)',
+    calc_btn:'احسب', save_btn:'حفظ', cancel:'إلغاء',
+    reste_label:'المبلغ المتبقي', payment_history:'سجل المدفوعات',
+    all_appts:'الكل', upcoming:'القادمة', passed:'الماضية',
+    select_client:'اختر المريض',
+    app_name:'العيادة الطبية', app_sub:'نظام الإدارة',
+    status_paid:'مدفوع', status_partial:'سلفة', status_pending:'معلق',
+    days_ago:'منذ {n}ي', in_days:'بعد {n}ي', today_label:'اليوم'
+  },
+  en: {
+    nav_dashboard:'Dashboard', nav_clients:'Clients', nav_appts:'Appointments', nav_payments:'Payments',
+    stat_today:'Clients today', stat_month:'Revenue this month', stat_pending:'Pending advances', stat_total_clients:'Total clients',
+    today_appts:'Today\'s appointments', add_appt:'New appointment', add_client:'New client', add_payment:'Record payment',
+    th_name:'Name', th_phone:'Phone', th_service:'Service', th_libague:'Treatment', th_avance:'Advance', th_reste:'Balance',
+    th_status:'Status', th_date:'Date', th_return:'Return', th_total:'Total', th_time:'Time',
+    total_price:'Total price (DH)', avance_label:'Advance received (DH)', return_days:'Appointment in (days)',
+    calc_btn:'Calculate', save_btn:'Save', cancel:'Cancel',
+    reste_label:'Balance due', payment_history:'Payment history',
+    all_appts:'All', upcoming:'Upcoming', passed:'Past',
+    select_client:'Select client',
+    app_name:'Medical Clinic', app_sub:'Management System',
+    status_paid:'Paid', status_partial:'Advance', status_pending:'Pending',
+    days_ago:'{n}d ago', in_days:'in {n}d', today_label:'Today'
+  }
+};
+
+let lang = 'fr';
+let clients = [
+  {id:1, name:'Fatima Zahra', phone:'0612345678', service:'Darssa', date:'2024-06-01', avance:1000, total:3000},
+  {id:2, name:'Ahmed Benali', phone:'0661234567', service:'Consultation', date:'2024-06-03', avance:500, total:500},
+  {id:3, name:'Khadija Amrani', phone:'0699887766', service:'Soin dentaire', date:'2024-06-05', avance:2000, total:2000},
+];
+let appointments = [
+  {id:1, clientId:1, service:'Darssa - séance 2', date:'2024-06-07', time:'09:00', libague:'Traitement semaine 1'},
+  {id:2, clientId:2, service:'Suivi', date:'2024-06-08', time:'10:30', libague:'Consultation suivi'},
+  {id:3, clientId:3, service:'Soin dentaire', date:'2024-06-12', time:'14:00', libague:'Détartrage'},
+];
+let payments = [
+  {date:'2024-06-01', clientId:1, service:'Darssa', total:3000, avance:1000, reste:2000},
+  {date:'2024-06-03', clientId:2, service:'Consultation', total:500, avance:500, reste:0},
+];
+
+function t(key) { return LANGS[lang][key] || key; }
+function fmt(n) { return Number(n).toLocaleString() + ' DH'; }
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('app-name').textContent = t('app_name');
+  document.getElementById('app-sub').textContent = t('app_sub');
+  document.querySelectorAll('[data-key]').forEach(el => {
+    el.textContent = t(el.dataset.key);
+  });
+  document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+  renderAll();
+}
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+  renderAll();
+}
+
+function daysDiff(dateStr) {
+  const d = new Date(dateStr); const now = new Date();
+  d.setHours(0,0,0,0); now.setHours(0,0,0,0);
+  return Math.round((d - now) / 86400000);
+}
+
+function returnLabel(diff) {
+  if (diff === 0) return t('today_label');
+  if (diff > 0) return t('in_days').replace('{n}', diff);
+  return t('days_ago').replace('{n}', Math.abs(diff));
+}
+
+function statusBadge(c) {
+  if (c.avance >= c.total) return `<span class="badge badge-success">${t('status_paid')}</span>`;
+  if (c.avance > 0) return `<span class="badge badge-warning">${t('status_partial')}</span>`;
+  return `<span class="badge badge-danger">${t('status_pending')}</span>`;
+}
+
+function getClient(id) { return clients.find(c => c.id === id) || {}; }
+
+function renderClients() {
+  const tb = document.getElementById('clients-tbody');
+  if (!tb) return;
+  tb.innerHTML = clients.map(c => {
+    const reste = Math.max(0, c.total - c.avance);
+    const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<tr><td><div style="display:flex;align-items:center;gap:8px"><div class="client-avatar">${initials}</div>${c.name}</div></td>
+    <td>${c.phone}</td><td>${c.service}</td>
+    <td><span class="badge badge-info">${c.service}</span></td>
+    <td style="color:#3B6D11;font-weight:500">${fmt(c.avance)}</td>
+    <td style="color:${reste>0?'#A32D2D':'#3B6D11'};font-weight:500">${fmt(reste)}</td>
+    <td>${statusBadge(c)}</td>
+    <td><button class="btn btn-sm" onclick="viewClient(${c.id})"><i class="ti ti-eye"></i></button></td></tr>`;
+  }).join('');
+}
+
+function renderAppts(filter) {
+  const tb = document.getElementById('appts-tbody');
+  if (!tb) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  let list = appointments;
+  if (filter === 'upcoming') list = list.filter(a => new Date(a.date) >= today);
+  if (filter === 'past') list = list.filter(a => new Date(a.date) < today);
+  tb.innerHTML = list.map(a => {
+    const c = getClient(a.clientId);
+    const diff = daysDiff(a.date);
+    const isPast = diff < 0;
+    return `<tr><td>${a.date} ${a.time}</td><td>${c.name||'-'}</td><td>${a.service}</td>
+    <td>${a.libague}</td>
+    <td><span class="badge ${diff===0?'badge-success':isPast?'badge-gray':'badge-info'}">${returnLabel(diff)}</span></td>
+    <td><span class="badge ${isPast?'badge-gray':'badge-success'}">${isPast ? t('passed') : t('upcoming')}</span></td></tr>`;
+  }).join('');
+}
+
+function renderPayments() {
+  const tb = document.getElementById('payments-tbody');
+  if (!tb) return;
+  tb.innerHTML = payments.map(p => {
+    const c = getClient(p.clientId);
+    return `<tr><td>${p.date}</td><td>${c.name||'-'}</td><td>${p.service}</td>
+    <td>${fmt(p.total)}</td><td style="color:#3B6D11">${fmt(p.avance)}</td>
+    <td style="color:${p.reste>0?'#A32D2D':'#3B6D11'};font-weight:500">${fmt(p.reste)}</td>
+    <td>${p.reste===0?`<span class="badge badge-success">${t('status_paid')}</span>`:`<span class="badge badge-warning">${t('status_partial')}</span>`}</td></tr>`;
+  }).join('');
+}
+
+function renderToday() {
+  const tl = document.getElementById('today-list');
+  if (!tl) return;
+  const today = new Date().toISOString().split('T')[0];
+  const todayAppts = appointments.filter(a => a.date === today);
+  if (todayAppts.length === 0) {
+    tl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--color-text-secondary);font-size:13px"><i class="ti ti-calendar-off" style="font-size:24px;display:block;margin-bottom:8px"></i>${t('today_appts')}: 0</div>`;
+    return;
+  }
+  tl.innerHTML = todayAppts.map(a => {
+    const c = getClient(a.clientId);
+    return `<div class="appt-item"><div class="appt-time">${a.time}</div><div><div class="appt-name">${c.name||'-'}</div><div class="appt-service">${a.service}</div></div><div style="margin-left:auto">${statusBadge(c)}</div></div>`;
+  }).join('');
+}
+
+function populateClientSelects() {
+  const opts = clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  const ps = document.getElementById('pay-client');
+  const nas = document.getElementById('na-client');
+  if (ps) ps.innerHTML = `<option value="">-- ${t('select_client')} --</option>` + opts;
+  if (nas) nas.innerHTML = opts;
+}
+
+function renderAll() {
+  renderClients(); renderAppts(); renderPayments(); renderToday(); populateClientSelects();
+}
+
+function filterAppts(f, el) {
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAppts(f);
+}
+
+function openNewClient() {
+  document.getElementById('nc-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-client').classList.add('open');
+}
+function openNewAppt() {
+  document.getElementById('na-date').value = new Date().toISOString().split('T')[0];
+  populateClientSelects();
+  document.getElementById('modal-appt').classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function saveClient() {
+  const name = document.getElementById('nc-name').value.trim();
+  const phone = document.getElementById('nc-phone').value.trim();
+  const service = document.getElementById('nc-service').value.trim();
+  if (!name) return;
+  clients.push({id: Date.now(), name, phone, service, date: document.getElementById('nc-date').value, avance:0, total:0});
+  closeModal('modal-client');
+  renderAll();
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[1].classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-clients').classList.add('active');
+}
+
+function saveAppt() {
+  const clientId = parseInt(document.getElementById('na-client').value);
+  const date = document.getElementById('na-date').value;
+  const time = document.getElementById('na-time').value;
+  const service = document.getElementById('na-service').value;
+  if (!clientId || !date) return;
+  appointments.push({id: Date.now(), clientId, service, date, time, libague: service});
+  closeModal('modal-appt');
+  renderAll();
+}
+
+function calcPay() {
+  const total = parseFloat(document.getElementById('pay-total').value) || 0;
+  const avance = parseFloat(document.getElementById('pay-avance').value) || 0;
+  const reste = Math.max(0, total - avance);
+  document.getElementById('ps-total').textContent = fmt(total);
+  document.getElementById('ps-avance').textContent = fmt(avance);
+  document.getElementById('ps-reste').textContent = fmt(reste);
+  document.getElementById('pay-summary').style.display = 'block';
+}
+
+function savePay() {
+  const clientId = parseInt(document.getElementById('pay-client').value);
+  const service = document.getElementById('pay-service').value;
+  const total = parseFloat(document.getElementById('pay-total').value) || 0;
+  const avance = parseFloat(document.getElementById('pay-avance').value) || 0;
+  const days = parseInt(document.getElementById('pay-days').value) || 0;
+  if (!clientId || !total) return;
+  const reste = Math.max(0, total - avance);
+  const today = new Date().toISOString().split('T')[0];
+  payments.unshift({date: today, clientId, service, total, avance, reste});
+  const c = clients.find(x => x.id === clientId);
+  if (c) { c.avance = avance; c.total = total; }
+  if (days > 0) {
+    const retDate = new Date(); retDate.setDate(retDate.getDate() + days);
+    appointments.push({id:Date.now(), clientId, service, date: retDate.toISOString().split('T')[0], time:'09:00', libague: service});
+  }
+  document.getElementById('pay-summary').style.display = 'none';
+  renderAll();
+  alert(lang==='ar'?'تم الحفظ!':lang==='fr'?'Enregistré !':'Saved!');
+}
+
+function viewClient(id) {
+  const c = clients.find(x=>x.id===id);
+  if (!c) return;
+  const msg = `${t('nav_clients')}: ${c.name}\n${t('th_service')}: ${c.service}\n${t('th_avance')}: ${fmt(c.avance)}\n${t('th_reste')}: ${fmt(Math.max(0,c.total-c.avance))}`;
+  alert(msg);
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
